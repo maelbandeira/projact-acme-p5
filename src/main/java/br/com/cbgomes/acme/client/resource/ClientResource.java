@@ -3,10 +3,10 @@
  */
 package br.com.cbgomes.acme.client.resource;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import br.com.cbgomes.acme.client.domain.Client;
 import br.com.cbgomes.acme.client.repository.ClientRepository;
@@ -30,8 +32,9 @@ public class ClientResource {
 	
 
 	@PutMapping()
-	public void updateClient(@RequestBody Client client) {
-		this.repository.save(client);
+	public void updateClient(@RequestBody Client client, @RequestParam("id") Long id) throws Exception{
+		this.repository.save(this.repository.findById(id).orElseThrow(() -> 
+		new ResponseStatusException(HttpStatus.BAD_REQUEST, "client not found")));
 		}	
 	
 	
@@ -54,6 +57,15 @@ public class ClientResource {
 	@PostMapping
 	public void createClient(@RequestBody Client client) {
 		this.repository.save(client);
+	}
+	@GetMapping	("/{email}")
+	public List<Client> getClientByEmail(@PathVariable("email")String email){
+		if( email != null ){ 			
+			return this.repository.findAll();	
+		}
+		new Exception("email not found!!!!");
+		return null;
+		
 	}
 	
 	
